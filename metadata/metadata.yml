@@ -1,0 +1,16 @@
+metadata_version: 1
+name: 'Cyberbullying Detection: Utilizing Social Media Features'
+description: Machine learning algorithms experimented on two different variants of the sample dataset. The first variant includes only textual features whereas the second variant consists of the determined social media features and textual features.   It is observed that each experimented machine learning algorithm give more successful prediction performance on the variant containing social media features. The obtained results motivate doing further research about social media characteristics in cyberbullying.
+authors:
+- name: Alican Bozyiğit
+  affiliations:
+  - name: Dokuz Eylül University
+- name: Semih Utku
+  affiliations:
+  - name: Dokuz Eylül University
+- name: Efendi Nasibov
+  affiliations:
+  - name: Dokuz Eylül University
+corresponding_contributor:
+  name: Alican Bozyiğit
+  email: alican.bozyigit@deu.edu.tr
