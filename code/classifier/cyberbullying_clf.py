@@ -41,7 +41,7 @@ pandas.options.mode.chained_assignment = None
 #Additionally, misspelled online bullying terms were corrected using the preprocessing method developed.
 #Note that it is sample dataset that contains only 500 tweets, the full dataset will be linked after the publication of article.
     
-csv = r'/data/sample_data.csv'
+csv = r'/content/gdrive/MyDrive/Project/CyberbullyingDetection-/data/cyberbullying_dataset.csv'
 dataset = pandas.read_csv(csv)
 feature_cols_sm = ['Retweets#','Favorites#','Hashtags#','Medias#','Mentions#','SenderAccountYears','SenderFavorites#','SenderFollowings#','SenderFollowers#','SenderStatues#']
 feature_cols_all=['Text']+feature_cols_sm
@@ -189,6 +189,7 @@ scores_ts = cross_val_score(clf, x_ts, y, cv=10)
 clf=svm.SVC(C=50, gamma= 0.01, kernel= 'rbf')
 scores_t = cross_val_score(clf, x_t, y, cv=10)
 
+
 #COMMENT OUT the related code blocks for experimenting other classifiers.
 #Note that textual feature size was set to  according to svc in this script, tune k for other classifiers to get their most succesfull results.
 #Remark that it is sample dataset that contains only 500 tweets, the full dataset will be linked after the publication of article.
@@ -196,22 +197,22 @@ scores_t = cross_val_score(clf, x_t, y, cv=10)
 #3.2) KNN
 
 #3.2.A)  text and social media features
-#clf= KNeighborsClassifier(n_neighbors= 3, metric="euclidean")
-#scores_ts = cross_val_score(clf, x_ts, y, cv=10)
+clf= KNeighborsClassifier(n_neighbors= 3, metric="euclidean")
+scores_ts = cross_val_score(clf, x_ts, y, cv=10)
 #3.2.B)  just text features
-#clf=KNeighborsClassifier(n_neighbors= 6, metric="euclidean")
-#scores_t = cross_val_score(clf, x_t, y, cv=10)
+clf=KNeighborsClassifier(n_neighbors= 6, metric="euclidean")
+scores_t = cross_val_score(clf, x_t, y, cv=10)
 
 
 
 #3.3) NBM
 
 #3.3.A)  text and social media features
-#clf= MultinomialNB()
-#scores_ts = cross_val_score(clf, x_ts, y, cv=10)
+clf= MultinomialNB()
+scores_ts = cross_val_score(clf, x_ts, y, cv=10)
 #3.3.B)  just text features
-#clf= MultinomialNB()
-#scores_t = cross_val_score(clf, x_t, y, cv=10)
+clf= MultinomialNB()
+scores_t = cross_val_score(clf, x_t, y, cv=10)
 
 
 
@@ -228,22 +229,22 @@ scores_t = cross_val_score(clf, x_t, y, cv=10)
 #3.5) AdaBoost
 
 #3.5.A)  text and social media features
-#clf=AdaBoostClassifier(learning_rate=0.1, n_estimators=1000)
-#scores_ts = cross_val_score(clf, x_ts, y, cv=10)
+clf=AdaBoostClassifier(learning_rate=0.1, n_estimators=1000)
+scores_ts = cross_val_score(clf, x_ts, y, cv=10)
 #3.5.B)  just text features
-#clf=AdaBoostClassifier(learning_rate=0.1, n_estimators=1000)
-#scores_t = cross_val_score(clf, x_t, y, cv=10)
+clf=AdaBoostClassifier(learning_rate=0.1, n_estimators=1000)
+scores_t = cross_val_score(clf, x_t, y, cv=10)
 
 
 
 #3.6) RF
 
 #3.6.A)  text and social media features
-#clf=RandomForestClassifier( max_features= 'log2', n_estimators= 250)
-#scores_ts = cross_val_score(clf, x_ts, y, cv=10)
+clf=RandomForestClassifier( max_features= 'log2', n_estimators= 250)
+scores_ts = cross_val_score(clf, x_ts, y, cv=10)
 #3.6.B)  just text features
-#clf=RandomForestClassifier(  max_features= 'log2', n_estimators= 200)
-#scores_t = cross_val_score(clf, x_t, y, cv=10)
+clf=RandomForestClassifier(  max_features= 'log2', n_estimators= 200)
+scores_t = cross_val_score(clf, x_t, y, cv=10)
 
 #4) RESULTS
 #Comparison  between the scores of the experimented classifier on dataset variants
