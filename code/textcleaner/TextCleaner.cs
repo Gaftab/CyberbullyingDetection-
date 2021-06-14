@@ -93,7 +93,7 @@ namespace DataMergingApp
         public static void SetSlangWords()
         {
             slangWords = new List<string>();
-            using (StreamReader file = new StreamReader(@"/data/turkish_slangwords.txt"))
+            using (StreamReader file = new StreamReader(@"/content/drive/MyDrive/Project/CyberbullyingDetection-/data/turkish_slangwords.txt"))
             {
                 string word;
                 while ((word = file.ReadLine()) != null)
@@ -106,7 +106,7 @@ namespace DataMergingApp
         public static void SetStopWords()
         {
             stopWords = new List<string>();
-            using (StreamReader file = new StreamReader(@"/data/turkish_stopwords.txt"))
+            using (StreamReader file = new StreamReader(@"/content/drive/MyDrive/Project/CyberbullyingDetection-/data/turkish_stopwords.txt"))
             {
                 string word;
                 while ((word = file.ReadLine()) != null)

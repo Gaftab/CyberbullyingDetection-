@@ -15,8 +15,10 @@ Created on Thu Nov 21 13:43:44 2019
 
 
 import numpy
+# import numpy as np
 import scipy
 import pandas
+import matplotlib.pyplot as plt
 from sklearn import svm
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import chi2
@@ -41,7 +43,7 @@ pandas.options.mode.chained_assignment = None
 #Additionally, misspelled online bullying terms were corrected using the preprocessing method developed.
 #Note that it is sample dataset that contains only 500 tweets, the full dataset will be linked after the publication of article.
     
-csv = r'/content/gdrive/MyDrive/Project/CyberbullyingDetection-/data/cyberbullying_dataset.csv'
+csv = r'/content/drive/MyDrive/Project/CyberbullyingDetection-/data/cyberbullying_dataset.csv'
 dataset = pandas.read_csv(csv)
 feature_cols_sm = ['Retweets#','Favorites#','Hashtags#','Medias#','Mentions#','SenderAccountYears','SenderFavorites#','SenderFollowings#','SenderFollowers#','SenderStatues#']
 feature_cols_all=['Text']+feature_cols_sm
@@ -81,7 +83,7 @@ x_text_tfidf =  tfidf_vect.transform(x_text)
 #     fit = test.fit(x_text_tfidf, y)
 #     x_t= fit.transform(x_text_tfidf)
 #     scores = cross_val_score(clf, x_t, y, cv=10)
-#     print(scores)
+    # print(scores)
 
 
 # Use k that has the most highest scores.
@@ -166,11 +168,11 @@ x_ts=hstack((x_t, x_sm))
 #3.1) SVM
 
 #3.1.A)  text and social media features
-clf=svm.SVC(C=5, kernel="linear")
-scores = cross_val_score(clf, x_ts, y, cv=10)
-#3.1.B)  just text features
-clf=svm.SVC(C=50, gamma= 0.01, kernel= 'rbf')
-scores = cross_val_score(clf, x_t, y, cv=10)
+# clf=svm.SVC(C=5, kernel="linear")
+# scores = cross_val_score(clf, x_ts, y, cv=10)
+# #3.1.B)  just text features
+# clf=svm.SVC(C=50, gamma= 0.01, kernel= 'rbf')
+# scores = cross_val_score(clf, x_t, y, cv=10)
 
 #3) CLASSIFIERS
     
@@ -185,10 +187,12 @@ scores = cross_val_score(clf, x_t, y, cv=10)
 #3.1.A)  text and social media features
 clf=svm.SVC(C=5, kernel="linear")
 scores_ts = cross_val_score(clf, x_ts, y, cv=10)
+svmTs=scores_ts.mean()
+
 #3.1.B)  just text features
 clf=svm.SVC(C=50, gamma= 0.01, kernel= 'rbf')
 scores_t = cross_val_score(clf, x_t, y, cv=10)
-
+svmT=scores_t.mean()
 
 #COMMENT OUT the related code blocks for experimenting other classifiers.
 #Note that textual feature size was set to  according to svc in this script, tune k for other classifiers to get their most succesfull results.
@@ -199,10 +203,11 @@ scores_t = cross_val_score(clf, x_t, y, cv=10)
 #3.2.A)  text and social media features
 clf= KNeighborsClassifier(n_neighbors= 3, metric="euclidean")
 scores_ts = cross_val_score(clf, x_ts, y, cv=10)
+knnTs=scores_ts.mean()
 #3.2.B)  just text features
 clf=KNeighborsClassifier(n_neighbors= 6, metric="euclidean")
 scores_t = cross_val_score(clf, x_t, y, cv=10)
-
+knnT=scores_t.mean()
 
 
 #3.3) NBM
@@ -210,20 +215,21 @@ scores_t = cross_val_score(clf, x_t, y, cv=10)
 #3.3.A)  text and social media features
 clf= MultinomialNB()
 scores_ts = cross_val_score(clf, x_ts, y, cv=10)
+nbmTs=scores_ts.mean()
 #3.3.B)  just text features
 clf= MultinomialNB()
 scores_t = cross_val_score(clf, x_t, y, cv=10)
-
+nbmT=scores_t.mean()
 
 
 #3.4) Logistic Regresyon
 
-#3.4.A)  text and social media features
-#clf=LogisticRegression(C=100,penalty="l2")
-#scores_ts = cross_val_score(clf, x_ts, y, cv=10)
-#3.4.B)  just text features
-#clf=LogisticRegression(C=100,penalty="l2")
-#scores_t = cross_val_score(clf, x_t, y, cv=10)
+# #3.4.A)  text and social media features
+# clf=LogisticRegression(C=50,penalty="l2")
+# scores_ts = cross_val_score(clf, x_ts, y, cv=10)
+# #3.4.B)  just text features
+# clf=LogisticRegression(C=100,penalty="l2")
+# scores_t = cross_val_score(clf, x_t, y, cv=10)
 
 
 #3.5) AdaBoost
@@ -231,10 +237,11 @@ scores_t = cross_val_score(clf, x_t, y, cv=10)
 #3.5.A)  text and social media features
 clf=AdaBoostClassifier(learning_rate=0.1, n_estimators=1000)
 scores_ts = cross_val_score(clf, x_ts, y, cv=10)
+adaBoostTs=scores_ts.mean()
 #3.5.B)  just text features
 clf=AdaBoostClassifier(learning_rate=0.1, n_estimators=1000)
 scores_t = cross_val_score(clf, x_t, y, cv=10)
-
+adaBoostT=scores_t.mean()
 
 
 #3.6) RF
@@ -242,13 +249,41 @@ scores_t = cross_val_score(clf, x_t, y, cv=10)
 #3.6.A)  text and social media features
 clf=RandomForestClassifier( max_features= 'log2', n_estimators= 250)
 scores_ts = cross_val_score(clf, x_ts, y, cv=10)
+rfTs=scores_ts.mean()
 #3.6.B)  just text features
 clf=RandomForestClassifier(  max_features= 'log2', n_estimators= 200)
 scores_t = cross_val_score(clf, x_t, y, cv=10)
-
+rfT=scores_t.mean()
 #4) RESULTS
 #Comparison  between the scores of the experimented classifier on dataset variants
-print('The score of the experimented classifier on the dataset that contains social media features in addition to textual features:')
-print(scores_ts.mean())
-print('The score of the experimented classifier on the dataset that contains just textual features:')
-print(scores_t.mean())
+allTs= [svmTs,knnTs,nbmTs,adaBoostTs,rfTs]
+allT= [svmT,knnT,nbmT,adaBoostT,rfT]
+
+w=0.4
+xA=["SVM","KNN","NBM","AdaBoost","RF"]
+# plt.bar(x,allTs,w,label="Text and Sosial ")
+
+bar1 = numpy.arange(len(xA))
+bar2 = [i+w for i in bar1 ]
+
+plt.bar(bar1,allTs,w,label="Dataset containing social media features and addition to textual features")
+plt.bar(bar2,allT,w,label="Dataset containing only textual features")
+
+
+plt.xlabel("Classifiers")
+plt.ylabel("Acuracy")
+plt.ylim(0.72, 0.92)
+plt.title("Accuracy of the experimented Classifiers")
+plt.xticks(bar1+w/2,xA)
+plt.legend(loc="upper center", bbox_to_anchor=(0.4, 1.30))
+plt.show()
+result_dir = '/content/drive/MyDrive/Project/CyberbullyingDetection-/results'
+plt.savefig(f"{result_dir}/result.png")
+
+
+
+
+# print('The score of the experimented classifier on the dataset that contains social media features in addition to textual features:')
+# print(scores_ts.mean())
+# print('The score of the experimented classifier on the dataset that contains just textual features:')
+# print(scores_t.mean())
