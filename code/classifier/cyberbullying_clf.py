@@ -106,54 +106,54 @@ x_ts=hstack((x_t, x_sm))
 
 #Experiment both x; x_ts or x_t
 
-# x=x_ts
+x=x_ts
 
-# search_grid = [{'kernel': ['rbf'], 'gamma': [1e-2, 1e-3, 1e-4, 1e-5],
-#                      'C': [0.001, 0.10, 0.1, 10, 25, 50, 100, 1000]},
-#                     {'kernel': ['sigmoid'], 'gamma': [1e-2, 1e-3, 1e-4, 1e-5],
-#                      'C': [0.001, 0.10, 0.1, 10, 25, 50, 100, 1000]},
-#                     {'kernel': ['linear'], 'C': [0.001, 0.10, 0.1, 10, 25, 50, 100, 1000]}
-#                    ]
-# search = GridSearchCV(SVC(), search_grid, cv=10, n_jobs=16 ,scoring='%s_macro' % 'recall')
-# search.fit(x, y)
-# search.best_params_
+search_grid = [{'kernel': ['rbf'], 'gamma': [1e-2, 1e-3, 1e-4, 1e-5],
+                     'C': [0.001, 0.10, 0.1, 10, 25, 50, 100, 1000]},
+                    {'kernel': ['sigmoid'], 'gamma': [1e-2, 1e-3, 1e-4, 1e-5],
+                     'C': [0.001, 0.10, 0.1, 10, 25, 50, 100, 1000]},
+                    {'kernel': ['linear'], 'C': [0.001, 0.10, 0.1, 10, 25, 50, 100, 1000]}
+                   ]
+search = GridSearchCV(SVC(), search_grid, cv=10, n_jobs=16 ,scoring='%s_macro' % 'recall')
+search.fit(x, y)
+search.best_params_
 
 
 #2.2) KNN
 
-# search_grid = dict(n_neighbors = list(range(1,31)), metric = ['euclidean', 'manhattan'] )
-# search = GridSearchCV(KNeighborsClassifier(), search_grid, cv = 10, scoring = 'recall', n_jobs=16)
-# search.fit(x,y)
-# search.best_params_
+search_grid = dict(n_neighbors = list(range(1,31)), metric = ['euclidean', 'manhattan'] )
+search = GridSearchCV(KNeighborsClassifier(), search_grid, cv = 10, scoring = 'recall', n_jobs=16)
+search.fit(x,y)
+search.best_params_
 
 
 
 #2.3) Logistic Regression
 
-# search_grid={"C":numpy.logspace(-3,3,7), "penalty":["l1","l2"]}# l1 lasso l2 ridge
-# search=GridSearchCV(LogisticRegression(), search_grid, cv=10)
-# search.fit(x,y)
-# search.best_params_
+search_grid={"C":numpy.logspace(-3,3,7), "penalty":["l2"]}# l1 lasso l2 ridge
+search=GridSearchCV(LogisticRegression(solver='lbfgs', max_iter=1000), search_grid, cv=10)
+search.fit(x,y)
+search.best_params_
 
 
 #2.4) AdaboostClassifier
 
 
-# search_grid={'n_estimators':[500,1000,2000],'learning_rate':[.001,0.01,.1]}
-# search=GridSearchCV(estimator=AdaBoostClassifier(),param_grid=search_grid,scoring='recall' , cv=10, n_jobs=32)
-# search.fit(x,y)
-# search.best_params_
+search_grid={'n_estimators':[500,1000,2000],'learning_rate':[.001,0.01,.1]}
+search=GridSearchCV(estimator=AdaBoostClassifier(),param_grid=search_grid,scoring='recall' , cv=10, n_jobs=32)
+search.fit(x,y)
+search.best_params_
 
 
 #2.5) RandomForestClassifier
 
-# search_grid = { 
-#     'n_estimators': [200, 700],
-#     'max_features': ['auto', 'sqrt', 'log2']
-# }
-# search = GridSearchCV(estimator=RandomForestClassifier(), param_grid=search_grid, cv= 10, n_jobs=-1)
-# search.fit(x, y)
-# search.best_params_
+search_grid = { 
+    'n_estimators': [200, 700],
+    'max_features': ['auto', 'sqrt', 'log2']
+}
+search = GridSearchCV(estimator=RandomForestClassifier(), param_grid=search_grid, cv= 10, n_jobs=-1)
+search.fit(x, y)
+search.best_params_
 
 
 
@@ -225,12 +225,13 @@ nbmT=scores_t.mean()
 #3.4) Logistic Regresyon
 
 # #3.4.A)  text and social media features
-# clf=LogisticRegression(C=50,penalty="l2")
-# scores_ts = cross_val_score(clf, x_ts, y, cv=10)
+clf=LogisticRegression(C=100,penalty="l2",solver='lbfgs', max_iter=1000)
+scores_ts = cross_val_score(clf, x_ts, y, cv=10)
+logregTs=scores_ts.mean()
 # #3.4.B)  just text features
-# clf=LogisticRegression(C=100,penalty="l2")
-# scores_t = cross_val_score(clf, x_t, y, cv=10)
-
+clf=LogisticRegression(C=100,penalty="l2",solver='lbfgs', max_iter=1000)
+scores_t = cross_val_score(clf, x_t, y, cv=10)
+logregT=scores_t.mean()
 
 #3.5) AdaBoost
 
@@ -243,7 +244,6 @@ clf=AdaBoostClassifier(learning_rate=0.1, n_estimators=1000)
 scores_t = cross_val_score(clf, x_t, y, cv=10)
 adaBoostT=scores_t.mean()
 
-
 #3.6) RF
 
 #3.6.A)  text and social media features
@@ -254,36 +254,41 @@ rfTs=scores_ts.mean()
 clf=RandomForestClassifier(  max_features= 'log2', n_estimators= 200)
 scores_t = cross_val_score(clf, x_t, y, cv=10)
 rfT=scores_t.mean()
+
 #4) RESULTS
 #Comparison  between the scores of the experimented classifier on dataset variants
-allTs= [svmTs,knnTs,nbmTs,adaBoostTs,rfTs]
-allT= [svmT,knnT,nbmT,adaBoostT,rfT]
+allTs= [svmTs,knnTs,nbmTs,logregTs,adaBoostTs,rfTs]
+allT= [svmT,knnT,nbmT,logregT,adaBoostT,rfT]
+labels = ['SVM','KNN','NBM','LR','AdaBoost','RF']
 
-w=0.4
-xA=["SVM","KNN","NBM","AdaBoost","RF"]
-# plt.bar(x,allTs,w,label="Text and Sosial ")
+x = numpy.arange(len(labels))  # the label locations
+width = 0.35  # the width of the bars
 
-bar1 = numpy.arange(len(xA))
-bar2 = [i+w for i in bar1 ]
+fig = plt.figure(figsize=(12,7))
+ax = fig.add_subplot()
+rects1 = ax.bar(x - width/2, allTs, width, label='Dataset containing social media features and addition to textual features')
+rects2 = ax.bar(x + width/2, allT, width, label='Dataset containing only textual features')
 
-plt.bar(bar1,allTs,w,label="Dataset containing social media features and addition to textual features")
-plt.bar(bar2,allT,w,label="Dataset containing only textual features")
+# Add some text for labels, title and custom x-axis tick labels, etc.
+ax.set_ylabel('Accuracy')
+ax.set_title('Accuracy of the experimented Classifiers')
+ax.set_xticks(x)
+ax.set_xticklabels(labels)
+plt.ylim(0.70, 0.92)
+ax.legend(loc="upper center", bbox_to_anchor=(0.4, 1.20))
 
-
-plt.xlabel("Classifiers")
-plt.ylabel("Acuracy")
-plt.ylim(0.72, 0.92)
-plt.title("Accuracy of the experimented Classifiers")
-plt.xticks(bar1+w/2,xA)
-plt.legend(loc="upper center", bbox_to_anchor=(0.4, 1.30))
+def autolabel(rects):
+    """Attach a text label above each bar in *rects*, displaying its height."""
+    for rect in rects:
+        height = rect.get_height()
+        ax.annotate('{}'.format(round(100*height,3)),
+                    xy=(rect.get_x() + rect.get_width() / 2, height),
+                    xytext=(0, 3),  # 3 points vertical offset
+                    textcoords="offset points",
+                    ha='center', va='bottom')
+autolabel(rects1)
+autolabel(rects2)
 plt.show()
 result_dir = '/content/drive/MyDrive/Project/CyberbullyingDetection-/results'
-plt.savefig(f"{result_dir}/result.png")
+plt.savefig(f"{result_dir}/test.png")
 
-
-
-
-# print('The score of the experimented classifier on the dataset that contains social media features in addition to textual features:')
-# print(scores_ts.mean())
-# print('The score of the experimented classifier on the dataset that contains just textual features:')
-# print(scores_t.mean())
