@@ -9,6 +9,7 @@ from sklearn import svm
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import chi2
 from sklearn.model_selection import cross_val_score
+from sklearn.metrics import accuracy_score
 from sklearn.feature_extraction.text import  TfidfVectorizer
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
@@ -31,7 +32,7 @@ pandas.options.mode.chained_assignment = None
     
 csv = r'/content/drive/MyDrive/Project/CyberbullyingDetection-/data/cyberbullying_dataset.csv'
 dataset = pandas.read_csv(csv)
-feature_cols_sm = ['Retweets#','Favorites#','Hashtags#','Medias#','Mentions#','SenderAccountYears','SenderFavorites#','SenderFollowings#','SenderFollowers#','SenderStatues#']
+feature_cols_sm = ['Retweets#','Favorites#','Hashtags#','Medias#','Mentions#','SenderAccountYears','SlangWords#','SenderFavorites#','SenderFollowings#','SenderFollowers#','SenderStatues#','IsSelfMentioned']
 feature_cols_all=['Text']+feature_cols_sm
 X = dataset[feature_cols_all] # All Features
 
@@ -72,13 +73,13 @@ x_text_tfidf =  tfidf_vect.transform(x_text)
 #     print(scores)
 
 
-clf=AdaBoostClassifier()
-for x in range(500, 4000, 500):
-    test = SelectKBest(score_func=chi2, k=x)
-    fit = test.fit(x_text_tfidf, y)
-    x_t= fit.transform(x_text_tfidf)
-    scores = cross_val_score(clf, x_t, y, cv=10)
-    print(scores)
+# clf=AdaBoostClassifier()
+# for x in range(500, 4000, 500):
+#     test = SelectKBest(score_func=chi2, k=x)
+#     fit = test.fit(x_text_tfidf, y)
+#     x_t= fit.transform(x_text_tfidf)
+#     scores = cross_val_score(clf, x_t, y, cv=10  )
+#     print(scores)
 
 # Use k that has the most highest scores.
 test = SelectKBest(score_func=chi2, k=500)
