@@ -50,8 +50,8 @@ dataset = pandas.read_csv(csv)
 le= preprocessing.LabelEncoder()
 dataset["SenderLocation"]=le.fit_transform(dataset["SenderLocation"].astype(str))
 dataset["SenderLocation"].unique()
-
-feature_cols_sm = ['Retweets#','Favorites#','Hashtags#','Medias#','Mentions#','SenderLocation','SenderAccountYears','SenderFavorites#','SenderFollowings#','SenderFollowers#','SenderStatues#','IsSelfMentioned']
+feature_cols_sm = ['IsRetweet','IsSelfMentioned','Retweets#','Favorites#','Hashtags#','Medias#','Mentions#','SenderId','SenderAccountYears','SenderFavorites#','SenderFollowings#','SenderFollowers#','SenderStatues#','SenderLocation','Emojis#','Punctuations#','UpperCaseLetter#','Letter#','Symbols#','Words#','TWords#','UWords#','SlangWords#','AvgWordLength']
+# feature_cols_sm = ['Retweets#','Favorites#','Hashtags#','Medias#','Mentions#','SenderLocation','SenderAccountYears','SenderFavorites#','SenderFollowings#','SenderFollowers#','SenderStatues#','IsSelfMentioned']
 feature_cols_all=['Text']+feature_cols_sm
 X = dataset[feature_cols_all] # All Features
 
