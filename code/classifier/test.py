@@ -19,6 +19,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import GridSearchCV
 from scipy.sparse import hstack
 from sklearn.preprocessing import MinMaxScaler
+from sklearn import preprocessing
 pandas.options.mode.chained_assignment = None 
 
 #0) INITIALIZE DATASET
@@ -32,15 +33,26 @@ pandas.options.mode.chained_assignment = None
     
 csv = r'/content/drive/MyDrive/Project/CyberbullyingDetection-/data/cyberbullying_dataset.csv'
 dataset = pandas.read_csv(csv)
-feature_cols_sm = ['Retweets#','Favorites#','Hashtags#','Medias#','Mentions#','SenderAccountYears','SlangWords#','SenderFavorites#','SenderFollowings#','SenderFollowers#','SenderStatues#','IsSelfMentioned']
+dataset.head()
+
+le= preprocessing.LabelEncoder()
+dataset["SenderLocation"]=le.fit_transform(dataset["SenderLocation"].astype(str))
+dataset["SenderLocation"].unique()
+# /data= df.drop("SenderLocation", axis='columns')
+# print(dataset.head())
+# print(dataset["SenderLocation"])
+
+# feature_cols_sm = ['IsRetweet','IsSelfMentioned','Retweets#','Favorites#','Hashtags#','Medias#','Mentions#','SenderId','SenderAccountYears','SenderFavorites#','SenderFollowings#','SenderFollowers#','SenderStatues#','SenderLocation','Emojis#','Punctuations#','UpperCaseLetter#','Letter#','Symbols#','Words#','TWords#','UWords#','SlangWords#','AvgWordLength']
+# feature_cols_sm = ['Retweets#','Favorites#','Hashtags#','Medias#','Mentions#','SenderLocation','SenderAccountYears','SenderFavorites#','SenderFollowings#','SenderFollowers#','SenderStatues#','IsSelfMentioned']
+feature_cols_sm = ['Retweets#','Favorites#','SenderLocation','SenderAccountYears','SenderFavorites#','SenderFollowings#','SenderFollowers#','SenderStatues#']
 feature_cols_all=['Text']+feature_cols_sm
 X = dataset[feature_cols_all] # All Features
 
-#1) FEATURE ENGINEERING
+# #1) FEATURE ENGINEERING
 
-#1.1) Normalization (Social Media Features)
+# #1.1) Normalization (Social Media Features)
 
-#The min-max normalization was applied to the numerical social media features of samples in the dataset to remove instability.
+# #The min-max normalization was applied to the numerical social media features of samples in the dataset to remove instability.
 
 scaler = MinMaxScaler()
 X[feature_cols_sm] = scaler.fit_transform(X[feature_cols_sm])
@@ -52,9 +64,9 @@ x_sm=X[feature_cols_sm]
 x_sm=scipy.sparse.csr_matrix(x_sm.values)
 y = dataset.IsCyberbullying # Target 
 
-# 1.2) Feature Extraction (Textual Features)
+# # 1.2) Feature Extraction (Textual Features)
 
-# The terms' weights were calculated using the Term Frequency - Inverse Document Frequency (TF-IDF)
+# # The terms' weights were calculated using the Term Frequency - Inverse Document Frequency (TF-IDF)
 tfidf_vect = TfidfVectorizer(analyzer='word', token_pattern=r'\w{1,}', max_features=50000)
 tfidf_vect.fit(x_text)
 x_text_tfidf =  tfidf_vect.transform(x_text)
@@ -73,13 +85,13 @@ x_text_tfidf =  tfidf_vect.transform(x_text)
 #     print(scores)
 
 
-# clf=AdaBoostClassifier()
-# for x in range(500, 4000, 500):
-#     test = SelectKBest(score_func=chi2, k=x)
-#     fit = test.fit(x_text_tfidf, y)
-#     x_t= fit.transform(x_text_tfidf)
-#     scores = cross_val_score(clf, x_t, y, cv=10  )
-#     print(scores)
+clf=KNeighborsClassifier()
+for x in range(500, 4000, 500):
+    test = SelectKBest(score_func=chi2, k=x)
+    fit = test.fit(x_text_tfidf, y)
+    x_t= fit.transform(x_text_tfidf)
+    scores = cross_val_score(clf, x_t, y, cv=10  )
+    print(scores)
 
 # Use k that has the most highest scores.
 test = SelectKBest(score_func=chi2, k=500)
@@ -89,6 +101,11 @@ fit = test.fit(x_text_tfidf, y)
 x_t= fit.transform(x_text_tfidf)
 #x_ts contain social media features in addition to textual features
 x_ts=hstack((x_t, x_sm))
+
+
+
+
+
 
 
 #2) PARAMETER OPTIMIZATION 
@@ -134,10 +151,10 @@ x=x_ts
 # #2.4) AdaboostClassifier
 
 
-search_grid={'n_estimators':[500,1000,2000],'learning_rate':[.001,0.01,.1]}
-search=GridSearchCV(estimator=AdaBoostClassifier(),param_grid=search_grid,scoring='recall' , cv=10, n_jobs=32)
-search.fit(x,y)
-search.best_params_
+# search_grid={'n_estimators':[500,1000,2000],'learning_rate':[.001,0.01,.1]}
+# search=GridSearchCV(estimator=AdaBoostClassifier(),param_grid=search_grid,scoring='recall' , cv=10, n_jobs=32)
+# search.fit(x,y)
+# search.best_params_
 
 
 # #2.5) RandomForestClassifier
@@ -195,7 +212,7 @@ search.best_params_
 
 # #3.2) KNN
 
-# #3.2.A)  text and social media features
+#3.2.A)  text and social media features
 # clf= KNeighborsClassifier(n_neighbors= 3, metric="euclidean")
 # scores_ts = cross_val_score(clf, x_ts, y, cv=10)
 # knnTs=scores_ts.mean()
@@ -230,14 +247,14 @@ search.best_params_
 
 # #3.5) AdaBoost
 
-# #3.5.A)  text and social media features
-clf=AdaBoostClassifier(learning_rate=0.1, n_estimators=1000)
-scores_ts = cross_val_score(clf, x_ts, y, cv=10)
-adaBoostTs=scores_ts.mean()
-#3.5.B)  just text features
-clf=AdaBoostClassifier(learning_rate=0.1, n_estimators=1000)
-scores_t = cross_val_score(clf, x_t, y, cv=10)
-adaBoostT=scores_t.mean()
+# # #3.5.A)  text and social media features
+# clf=AdaBoostClassifier(learning_rate=0.1, n_estimators=1000)
+# scores_ts = cross_val_score(clf, x_ts, y, cv=10)
+# adaBoostTs=scores_ts.mean()
+# #3.5.B)  just text features
+# clf=AdaBoostClassifier(learning_rate=0.1, n_estimators=1000)
+# scores_t = cross_val_score(clf, x_t, y, cv=10)
+# adaBoostT=scores_t.mean()
 
 # #3.6) RF
 
@@ -250,8 +267,8 @@ adaBoostT=scores_t.mean()
 # scores_t = cross_val_score(clf, x_t, y, cv=10)
 # rfT=scores_t.mean()
 
-print(adaBoostT)
-print(adaBoostTs)
+# print(knnT)
+# print(knnTs)
 
 # allT= [svmT,knnT,nbmT,logregT,adaBoostT,rfT]
 # labels = ['SVM','KNN','NBM','LR','AdaBoost','RF']

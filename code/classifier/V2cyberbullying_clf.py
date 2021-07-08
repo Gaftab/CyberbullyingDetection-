@@ -32,6 +32,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import GridSearchCV
 from scipy.sparse import hstack
 from sklearn.preprocessing import MinMaxScaler
+from sklearn import preprocessing
 pandas.options.mode.chained_assignment = None 
 
 #0) INITIALIZE DATASET
@@ -45,7 +46,12 @@ pandas.options.mode.chained_assignment = None
     
 csv = r'/content/drive/MyDrive/Project/CyberbullyingDetection-/data/cyberbullying_dataset.csv'
 dataset = pandas.read_csv(csv)
-feature_cols_sm = ['Retweets#','Favorites#','Hashtags#','Medias#','Mentions#','SenderAccountYears','SenderFavorites#','SenderFollowings#','SenderFollowers#','SenderStatues#','IsSelfMentioned']
+
+le= preprocessing.LabelEncoder()
+dataset["SenderLocation"]=le.fit_transform(dataset["SenderLocation"].astype(str))
+dataset["SenderLocation"].unique()
+
+feature_cols_sm = ['Retweets#','Favorites#','Hashtags#','Medias#','Mentions#','SenderLocation','SenderAccountYears','SenderFavorites#','SenderFollowings#','SenderFollowers#','SenderStatues#','IsSelfMentioned']
 feature_cols_all=['Text']+feature_cols_sm
 X = dataset[feature_cols_all] # All Features
 
@@ -83,7 +89,7 @@ for x in range(500, 4000, 500):
     fit = test.fit(x_text_tfidf, y)
     x_t= fit.transform(x_text_tfidf)
     scores = cross_val_score(clf, x_t, y, cv=10)
-    # print(scores)
+    print(scores)
 
 
 # Use k that has the most highest scores.
