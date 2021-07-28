@@ -32,6 +32,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import GridSearchCV
 from scipy.sparse import hstack
 from sklearn.preprocessing import MinMaxScaler
+from sklearn import preprocessing
 pandas.options.mode.chained_assignment = None 
 
 #0) INITIALIZE DATASET
@@ -46,15 +47,20 @@ pandas.options.mode.chained_assignment = None
 csv = r'/content/drive/MyDrive/Project/CyberbullyingDetection-/data/cyberbullying_dataset.csv'
 dataset = pandas.read_csv(csv)
 
+
 pandas.get_dummies(dataset["SenderLocation"]).shape
 # len(dataset["SenderLocation"].unique())
 df_frequency_map =dataset["SenderLocation"].value_counts().to_dict()
 dataset["SenderLocation"]=dataset["SenderLocation"].map(df_frequency_map)
 dataset["SenderLocation"]= dataset["SenderLocation"].fillna(0)
 
-# feature_cols_sm = ['IsRetweet','IsSelfMentioned','Retweets#','Favorites#','Hashtags#','Medias#','Mentions#','SenderId','SenderAccountYears','SenderFavorites#','SenderFollowings#','SenderFollowers#','SenderStatues#','SenderLocation','Emojis#','Punctuations#','UpperCaseLetter#','Letter#','Symbols#','Words#','TWords#','UWords#','SlangWords#','AvgWordLength']# all attributes
-feature_cols_sm = ['Retweets#','Favorites#','Hashtags#','Medias#','Mentions#','SenderLocation','SenderAccountYears','SenderFavorites#','SenderFollowings#','SenderFollowers#','SenderStatues#','IsSelfMentioned']# paper features
-# feature_cols_sm = ['Retweets#','Favorites#','SenderLocation','SenderAccountYears','SenderFavorites#','SenderFollowings#','SenderFollowers#','SenderStatues#'] # Api features
+
+# le= preprocessing.LabelEncoder()
+# dataset["SenderLocation"]=le.fit_transform(dataset["SenderLocation"].astype(str))
+# dataset["SenderLocation"].unique()
+# feature_cols_sm = ['IsRetweet','IsSelfMentioned','Retweets#','Favorites#','Hashtags#','Medias#','Mentions#','SenderId','SenderAccountYears','SenderFavorites#','SenderFollowings#','SenderFollowers#','SenderStatues#','SenderLocation','Emojis#','Punctuations#','UpperCaseLetter#','Letter#','Symbols#','Words#','TWords#','UWords#','SlangWords#','AvgWordLength']
+feature_cols_sm = ['Retweets#','Favorites#','Hashtags#','Medias#','Mentions#','SenderLocation','SenderAccountYears','SenderFavorites#','SenderFollowings#','SenderFollowers#','SenderStatues#','IsSelfMentioned']
+
 feature_cols_all=['Text']+feature_cols_sm
 X = dataset[feature_cols_all] # All Features
 
@@ -92,7 +98,7 @@ for x in range(500, 4000, 500):
     fit = test.fit(x_text_tfidf, y)
     x_t= fit.transform(x_text_tfidf)
     scores = cross_val_score(clf, x_t, y, cv=10)
-    # print(scores)
+    print(scores)
 
 
 # Use k that has the most highest scores.
